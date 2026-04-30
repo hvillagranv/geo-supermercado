@@ -1,0 +1,231 @@
+====================================================================
+    NUEVA FUNCIONALIDAD: SELECCIÓN MANUAL EN EL MAPA
+====================================================================
+
+✅ FUNCIONALIDAD IMPLEMENTADA
+
+Ahora puedes hacer clic en cualquier punto del mapa para buscar 
+supermercados cercanos a esa ubicación.
+
+====================================================================
+
+🎯 CARACTERÍSTICAS:
+
+1. Click en el mapa
+   - Haz clic en cualquier punto del mapa
+   - Automáticamente se buscarán supermercados cercanos
+   - Aparecerá un marcador VERDE en la ubicación seleccionada
+
+2. Marcadores de colores
+   - 🔵 AZUL: Tu ubicación GPS real
+   - 🟢 VERDE: Ubicación seleccionada manualmente en el mapa
+   - 🔴 ROJO: Supermercados
+
+3. Botón de reseteo
+   - Cuando seleccionas manualmente una ubicación, aparece botón "🔄 Resetear"
+   - Te regresa a tu ubicación GPS original
+   - Puedes alternar entre ubicación GPS y manual
+
+4. Cursor interactivo
+   - El cursor del mapa cambia a cruz (+) indicando que es clickeable
+   - Facilita saber que puedes hacer clic
+
+====================================================================
+
+📋 CÓMO USAR:
+
+Opción 1: Usar tu ubicación GPS
+1. Abre http://localhost:3000
+2. Haz clic en "📍 Mi Ubicación GPS"
+3. Acepta los permisos del navegador
+4. Verás tu ubicación con marcador AZUL
+5. Los supermercados cercanos aparecerán automáticamente
+
+Opción 2: Seleccionar ubicación manualmente
+1. Abre http://localhost:3000
+2. Navega en el mapa a la zona que te interese
+3. Haz clic en cualquier punto del mapa
+4. Aparecerá un marcador VERDE
+5. Los supermercados cercanos a ese punto aparecerán automáticamente
+
+Opción 3: Combinar ambas
+1. Usa "Mi Ubicación GPS" primero
+2. Luego haz clic en otro punto del mapa para explorar
+3. Usa "🔄 Resetear" para volver a tu ubicación GPS
+4. Repite el proceso cuantas veces quieras
+
+====================================================================
+
+🗺️ CASOS DE USO PRÁCTICOS:
+
+Caso 1: Planificar compras antes de viajar
+   - Estás en Concepción pero viajarás a Talcahuano
+   - Haz clic en Talcahuano en el mapa
+   - Verás supermercados de esa zona
+   - Planifica tu ruta de compras
+
+Caso 2: Comparar zonas
+   - Haz clic en diferentes zonas de la ciudad
+   - Compara qué supermercados hay en cada sector
+   - Decide dónde te conviene ir
+
+Caso 3: Buscar en ruta
+   - Haz clic a lo largo de tu ruta de viaje
+   - Encuentra supermercados en el camino
+   - Optimiza paradas
+
+Caso 4: Explorar sin GPS
+   - Si no quieres compartir tu ubicación GPS
+   - O si tu dispositivo no tiene GPS
+   - Simplemente navega y haz clic en el mapa
+
+====================================================================
+
+💡 TIPS Y CONSEJOS:
+
+✓ Zoom antes de hacer clic
+  - Acerca el mapa a la zona específica
+  - Luego haz clic para mayor precisión
+
+✓ Ajusta el radio después del click
+  - Haz clic en una zona
+  - Ajusta el slider de radio (1-50 km)
+  - Explora diferentes áreas de búsqueda
+
+✓ Click múltiple
+  - Puedes hacer clic varias veces
+  - Cada click actualiza la búsqueda
+  - No necesitas resetear entre clicks
+
+✓ Usa el reseteo estratégicamente
+  - Explora varias zonas
+  - Cuando quieras volver a tu ubicación
+  - Un solo click en "Resetear"
+
+====================================================================
+
+🎨 INDICADORES VISUALES:
+
+Mensaje azul (Info):
+  "💡 Haz clic en 'Mi Ubicación GPS' o haz clic en cualquier 
+   punto del mapa para buscar supermercados"
+  → Aparece cuando no hay ubicación seleccionada
+
+Mensaje verde (Success):
+  "✓ Ubicación seleccionada en el mapa. Haz clic en otro punto 
+   para cambiar o usa 'Resetear' para volver a tu ubicación GPS."
+  → Aparece cuando seleccionas manualmente una ubicación
+
+Botón "🔄 Resetear":
+  → Solo aparece cuando has seleccionado manualmente una ubicación
+  → Te permite volver rápido a tu GPS
+
+Cursor en cruz (+):
+  → Indica que el mapa es clickeable
+  → Invita a hacer clic
+
+====================================================================
+
+🔧 DETALLES TÉCNICOS:
+
+Componente actualizado:
+  - frontend/src/components/Mapa.jsx
+
+Nuevas funcionalidades:
+  - useMapEvents hook para capturar clicks
+  - MapClickHandler componente
+  - Estado isManualLocation
+  - Estado clickedLocation
+  - Icono verde para ubicación temporal
+  - Lógica de reset a ubicación GPS
+
+Estilos actualizados:
+  - frontend/src/App.css
+  - Nuevos estilos para btn-group
+  - Nuevos estilos para btn-reset
+  - Nuevos estilos para alert-info y alert-success
+  - Cursor crosshair en el mapa
+
+====================================================================
+
+📱 COMPORTAMIENTO RESPONSIVE:
+
+En móviles:
+  - Botones "Mi Ubicación GPS" y "Resetear" ocupan ancho completo
+  - Se apilan verticalmente
+  - Fácil de tocar con el dedo
+  - Click en mapa funciona con touch
+
+En tablets/desktop:
+  - Botones uno al lado del otro
+  - Mayor precisión con mouse
+  - Mejor experiencia de navegación
+
+====================================================================
+
+🧪 PARA PROBAR:
+
+1. Refresca la aplicación: http://localhost:3000
+
+2. Prueba estos escenarios:
+
+   Escenario A: Click directo sin GPS
+   - Abre la app
+   - Haz zoom en Concepción
+   - Haz clic en el centro de Concepción
+   - Verás supermercados cercanos
+
+   Escenario B: GPS primero, luego manual
+   - Click en "Mi Ubicación GPS"
+   - Acepta permisos
+   - Haz zoom en otra ciudad (ej: Talcahuano)
+   - Haz clic allí
+   - Verás supermercados de Talcahuano
+   - Click "Resetear"
+   - Vuelves a tu ubicación GPS
+
+   Escenario C: Múltiples clicks
+   - Haz clic en Concepción
+   - Luego en San Pedro
+   - Luego en Talcahuano
+   - Cada click actualiza la lista
+
+   Escenario D: Ajustar radio dinámicamente
+   - Haz clic en un punto del mapa
+   - Mueve el slider de radio
+   - Observa cómo cambia la lista
+
+====================================================================
+
+🎉 BENEFICIOS DE ESTA FUNCIONALIDAD:
+
+✅ Mayor flexibilidad de búsqueda
+✅ No dependes 100% del GPS
+✅ Puedes explorar zonas antes de visitarlas
+✅ Planificación de rutas más fácil
+✅ Mejor experiencia de usuario
+✅ Funciona sin permisos de geolocalización
+✅ Ideal para comparar zonas
+
+====================================================================
+
+📊 RESUMEN:
+
+Antes: Solo podías usar tu ubicación GPS
+Ahora:  GPS + Click manual + Alternancia entre ambos
+
+Marcadores:
+  - Azul: GPS
+  - Verde: Manual
+  - Rojo: Supermercados
+
+Controles:
+  - "Mi Ubicación GPS": Activa GPS
+  - "Resetear": Vuelve a GPS
+  - Click en mapa: Ubicación manual
+
+====================================================================
+
+¡Disfruta explorando supermercados en todo Chile! 🗺️🛒
+
+====================================================================

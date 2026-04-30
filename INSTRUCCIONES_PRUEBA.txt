@@ -1,0 +1,242 @@
+====================================================================
+        INSTRUCCIONES: PROBAR NUEVA FUNCIONALIDAD
+====================================================================
+
+🔄 PASO 1: REFRESCAR LA APLICACIÓN
+
+El frontend con Vite se actualiza automáticamente, pero para asegurarte:
+
+1. Ve a tu navegador donde está abierto http://localhost:3000
+2. Presiona Ctrl + F5 (o Cmd + Shift + R en Mac)
+3. Esto hará un "hard refresh" y cargará los nuevos cambios
+
+====================================================================
+
+✅ PASO 2: VERIFICAR QUE LOS CAMBIOS ESTÉN APLICADOS
+
+Deberías ver estos cambios en la interfaz:
+
+1. Botón cambiado de nombre:
+   Antes: "📍 Mi Ubicación"
+   Ahora:  "📍 Mi Ubicación GPS"
+
+2. Nuevo mensaje azul informativo:
+   "💡 Haz clic en 'Mi Ubicación GPS' o haz clic en cualquier 
+    punto del mapa para buscar supermercados"
+
+3. Cursor en forma de cruz (+) cuando pasas el mouse sobre el mapa
+
+4. El mapa es clickeable
+
+====================================================================
+
+🧪 PASO 3: PROBAR LA FUNCIONALIDAD
+
+PRUEBA 1: Click directo en el mapa
+------------------------------------
+1. Sin hacer clic en "Mi Ubicación GPS"
+2. Navega en el mapa hacia Concepción
+   - Usa la rueda del mouse para hacer zoom
+   - Arrastra el mapa para moverte
+3. HAZ CLIC en el centro de Concepción
+4. Deberías ver:
+   ✓ Un marcador VERDE aparece donde hiciste clic
+   ✓ Mensaje verde: "✓ Ubicación seleccionada en el mapa..."
+   ✓ Botón "🔄 Resetear" aparece al lado de "Mi Ubicación GPS"
+   ✓ Lista de supermercados se actualiza automáticamente
+   ✓ Control de radio aparece (si no estaba)
+
+PRUEBA 2: Múltiples clicks
+---------------------------
+1. Haz clic en Concepción
+2. Observa los supermercados que aparecen
+3. Haz clic en Talcahuano (más al norte)
+4. Observa cómo cambia la lista
+5. Haz clic en San Pedro (más al sur)
+6. Lista se actualiza cada vez
+
+PRUEBA 3: GPS + Manual + Reset
+-------------------------------
+1. Haz clic en "📍 Mi Ubicación GPS"
+2. Acepta los permisos del navegador
+3. Verás marcador AZUL en tu ubicación
+4. Haz zoom out para ver otras ciudades
+5. Haz clic en una ciudad diferente
+6. Aparece marcador VERDE
+7. Lista muestra supermercados de la nueva zona
+8. Haz clic en "🔄 Resetear"
+9. Vuelves a tu ubicación GPS (marcador azul)
+10. Botón "Resetear" desaparece
+
+PRUEBA 4: Ajustar radio después de click
+-----------------------------------------
+1. Haz clic en cualquier punto del mapa
+2. Observa cuántos supermercados aparecen
+3. Mueve el slider de radio:
+   - Prueba con 3 km
+   - Prueba con 10 km  
+   - Prueba con 30 km
+4. La lista se actualiza automáticamente
+
+====================================================================
+
+🎯 CASOS DE USO REALES PARA PROBAR:
+
+Caso 1: Planificar compras en Concepción
+-----------------------------------------
+1. Haz clic en el centro de Concepción (Plaza de la Independencia)
+2. Radio 5 km
+3. Deberías ver:
+   - Jumbo Concepción Centro (0.0 km)
+   - Santa Isabel Barros Arana (~0.12 km)
+   - Tottus Mall del Centro (~0.26 km)
+   - Unimarc Freire (~0.49 km)
+   - Lider Concepción (~0.91 km)
+
+Caso 2: Explorar Mall Plaza El Trébol (Talcahuano)
+---------------------------------------------------
+1. Navega hacia Talcahuano
+2. Haz clic en Mall Plaza El Trébol
+3. Radio 5 km
+4. Deberías ver:
+   - Jumbo Talcahuano (0.0 km)
+   - Lider El Trébol (~0.21 km)
+   - Unimarc Talcahuano Centro (~1.04 km)
+   - Santa Isabel Talcahuano (~1.73 km)
+
+Caso 3: Encontrar supermercados en ruta Conce-Talca
+----------------------------------------------------
+1. Haz clic en un punto intermedio entre ciudades
+2. Aumenta radio a 20-30 km
+3. Verás supermercados de ambas zonas
+4. Útil para planificar paradas
+
+====================================================================
+
+❓ SI ALGO NO FUNCIONA:
+
+Problema: No aparece el cursor en cruz
+Solución: Refresca con Ctrl + F5
+
+Problema: El click no hace nada
+Solución: 
+  1. Verifica que el frontend esté corriendo
+  2. Abre consola del navegador (F12)
+  3. Busca errores en rojo
+  4. Comparte el error
+
+Problema: No aparece marcador verde
+Solución:
+  1. Asegúrate de hacer clic DENTRO del mapa
+  2. No en los bordes ni fuera
+  3. El click debe ser en la zona gris/verde del mapa
+
+Problema: Botón "Resetear" no aparece
+Solución: 
+  - Solo aparece cuando seleccionas manualmente
+  - No aparece si usas solo GPS
+
+Problema: El mensaje verde no aparece
+Solución:
+  - Asegúrate de hacer clic en el mapa
+  - Debe aparecer después del primer click manual
+
+====================================================================
+
+🎨 CÓMO SE VE VISUALMENTE:
+
+Estado inicial (sin ubicación):
+┌────────────────────────────────────────┐
+│ Supermercados Cercanos  [Mi Ubicación GPS] │
+├────────────────────────────────────────┤
+│ 💡 Haz clic en 'Mi Ubicación GPS'     │
+│    o haz clic en cualquier punto...   │
+├────────────────────────────────────────┤
+│                                        │
+│          [MAPA CON CURSOR +]           │
+│                                        │
+└────────────────────────────────────────┘
+
+Después de click manual:
+┌────────────────────────────────────────┐
+│ Supermercados  [Mi Ubicación GPS] [🔄 Resetear] │
+├────────────────────────────────────────┤
+│ ✓ Ubicación seleccionada en el mapa   │
+├────────────────────────────────────────┤
+│                                        │
+│     [MAPA CON MARCADOR VERDE 🟢]       │
+│     [MARCADORES ROJOS 🔴🔴🔴]          │
+│                                        │
+└────────────────────────────────────────┘
+
+Con GPS + Manual:
+┌────────────────────────────────────────┐
+│ Supermercados  [Mi Ubicación GPS] [🔄 Resetear] │
+├────────────────────────────────────────┤
+│ ✓ Ubicación seleccionada en el mapa   │
+├────────────────────────────────────────┤
+│                                        │
+│  [MARCADOR AZUL 🔵 (tu GPS)]           │
+│  [MARCADOR VERDE 🟢 (click manual)]    │
+│  [MARCADORES ROJOS 🔴🔴 (supermercados)]│
+│                                        │
+└────────────────────────────────────────┘
+
+====================================================================
+
+📸 CAPTURAS ESPERADAS:
+
+1. Antes de cualquier acción:
+   - Mapa centrado en Santiago por defecto
+   - Sin marcadores
+   - Solo botón "Mi Ubicación GPS"
+   - Mensaje azul de instrucciones
+
+2. Después del primer click:
+   - Marcador verde donde hiciste clic
+   - Marcadores rojos de supermercados
+   - Botón "Resetear" visible
+   - Mensaje verde de confirmación
+   - Lista de supermercados actualizada
+
+3. Con GPS activo:
+   - Marcador azul en tu ubicación
+   - Si haces click: también marcador verde
+   - Ambos botones visibles
+
+====================================================================
+
+✅ CHECKLIST DE VERIFICACIÓN:
+
+□ Página refresca correctamente (Ctrl + F5)
+□ Botón dice "Mi Ubicación GPS" (no solo "Mi Ubicación")
+□ Mensaje azul informativo aparece al inicio
+□ Cursor cambia a cruz (+) sobre el mapa
+□ Click en mapa crea marcador verde
+□ Mensaje verde aparece después de click
+□ Botón "Resetear" aparece después de click manual
+□ Lista de supermercados se actualiza con cada click
+□ Marcadores rojos aparecen en supermercados
+□ Click en "Resetear" vuelve a GPS (si estaba activo)
+□ Múltiples clicks funcionan correctamente
+□ Radio slider sigue funcionando
+
+====================================================================
+
+💬 FEEDBACK:
+
+Después de probar, responde:
+
+1. ¿Funcionó el click en el mapa?
+2. ¿Apareció el marcador verde?
+3. ¿Se actualizó la lista de supermercados?
+4. ¿El botón "Resetear" funciona?
+5. ¿Algún error en consola? (F12)
+6. ¿Qué te pareció la funcionalidad?
+7. ¿Alguna sugerencia de mejora?
+
+====================================================================
+
+¡Disfruta la nueva funcionalidad! 🎉
+
+====================================================================

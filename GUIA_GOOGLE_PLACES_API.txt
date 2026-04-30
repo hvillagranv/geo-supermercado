@@ -1,0 +1,426 @@
+====================================================================
+    GUÍA COMPLETA: EXTRACCIÓN DE TODOS LOS SUPERMERCADOS
+    USANDO GOOGLE PLACES API
+====================================================================
+
+📋 TABLA DE CONTENIDOS:
+
+1. ¿Por qué Google Places API?
+2. Configuración paso a paso
+3. Cómo ejecutar la extracción
+4. Costos y límites
+5. Resultados esperados
+6. Solución de problemas
+
+====================================================================
+
+1. ¿POR QUÉ GOOGLE PLACES API?
+====================================================================
+
+✅ VENTAJAS:
+  - Base de datos más completa del mundo
+  - Datos actualizados constantemente
+  - Incluye: nombre, dirección, coordenadas, teléfono, horarios
+  - Cobertura de TODO Chile (urbano y rural)
+  - API confiable y bien documentada
+  - Reviews y ratings de usuarios
+  - Fotos de los locales
+
+✅ COMPARACIÓN CON OTRAS OPCIONES:
+
+  Web Scraping:
+    ❌ Se rompe cuando cambian los sitios web
+    ❌ Puede violar términos de servicio
+    ❌ Requiere mantenimiento constante
+    ❌ Bloqueado por muchos sitios
+  
+  OpenStreetMap (OSM):
+    ⚠️ Datos incompletos en Chile
+    ⚠️ Depende de colaboradores voluntarios
+    ⚠️ Puede tener información desactualizada
+    ✅ Gratis y sin límites
+  
+  Google Places API:
+    ✅ Datos completos y actualizados
+    ✅ API estable y confiable
+    ✅ $200 USD gratis mensuales
+    ⚠️ Costo después del límite gratuito
+    ✅ Cobertura mundial
+
+====================================================================
+
+2. CONFIGURACIÓN PASO A PASO
+====================================================================
+
+PASO 1: Crear cuenta en Google Cloud Platform
+----------------------------------------------
+1. Ve a: https://console.cloud.google.com/
+2. Inicia sesión con tu cuenta de Google
+3. Si es tu primera vez, acepta los términos de servicio
+
+PASO 2: Crear un proyecto
+--------------------------
+1. Click en "Seleccionar un proyecto" (arriba a la izquierda)
+2. Click en "NUEVO PROYECTO"
+3. Nombre del proyecto: "GeoSupermercado" (o el que prefieras)
+4. Click en "CREAR"
+5. Espera unos segundos hasta que se cree
+
+PASO 3: Habilitar Places API
+-----------------------------
+1. En el menú lateral, ve a "APIs y servicios" > "Biblioteca"
+2. Busca "Places API"
+3. Click en "Places API"
+4. Click en "HABILITAR"
+5. Espera unos segundos
+
+PASO 4: Crear credenciales (API Key)
+-------------------------------------
+1. En el menú lateral, ve a "APIs y servicios" > "Credenciales"
+2. Click en "CREAR CREDENCIALES" > "Clave de API"
+3. Se creará tu API key
+4. COPIA LA API KEY (es una cadena larga de caracteres)
+5. (Opcional) Click en "RESTRINGIR CLAVE" para mayor seguridad:
+   - Restricciones de API: Selecciona "Places API"
+   - Restricciones de aplicación: Deja "Ninguna" por ahora
+
+PASO 5: Configurar facturación (requerido pero gratis)
+-------------------------------------------------------
+IMPORTANTE: Google requiere método de pago pero NO te cobrará
+si no superas los $200 USD mensuales gratuitos.
+
+1. En el menú lateral, ve a "Facturación"
+2. Click en "VINCULAR UNA CUENTA DE FACTURACIÓN"
+3. Click en "CREAR CUENTA DE FACTURACIÓN"
+4. Completa la información:
+   - Tipo de cuenta: Individual o Empresa
+   - Nombre y dirección
+   - Método de pago (tarjeta de crédito/débito)
+5. Acepta términos y click en "ENVIAR E INICIAR MI PRUEBA GRATUITA"
+
+NO TE PREOCUPES: 
+- Recibes $300 USD de crédito gratis por 90 días
+- Después, $200 USD gratis mensuales permanentemente
+- NO se te cobrará automáticamente
+- Recibirás notificación si te acercas al límite
+
+PASO 6: Configurar API key en tu proyecto
+------------------------------------------
+1. Crea un archivo .env en la carpeta backend:
+   
+   Copiar .env.example a .env:
+   ```bash
+   cd backend
+   copy .env.example .env
+   ```
+
+2. Edita el archivo .env y pega tu API key:
+   ```
+   GOOGLE_PLACES_API_KEY=AIzaSyD...tu_api_key_aqui...XYZ
+   ```
+
+3. Guarda el archivo
+
+====================================================================
+
+3. CÓMO EJECUTAR LA EXTRACCIÓN
+====================================================================
+
+OPCIÓN A: Extracción completa (RECOMENDADO)
+--------------------------------------------
+Esto buscará TODOS los supermercados en 20+ ciudades de Chile
+
+1. Asegúrate de tener el .env configurado con tu API key
+
+2. Ejecuta el script de extracción:
+   ```bash
+   cd backend
+   python extract_google_places.py
+   ```
+
+3. El script mostrará:
+   - Ciudades a buscar: 20
+   - Cadenas a buscar: 13
+   - Búsquedas estimadas: 260
+   - Presiona ENTER para comenzar
+
+4. La extracción tomará ~15-30 minutos (hay delays para respetar rate limits)
+
+5. Al terminar verás:
+   - Total de supermercados encontrados
+   - Desglose por cadena
+   - Costo estimado (~$8-15 USD)
+   - Archivo guardado: supermarkets_google_places.json
+
+6. Poblar la base de datos:
+   ```bash
+   python populate_from_google_places.py
+   ```
+
+OPCIÓN B: Extracción limitada (para pruebas)
+---------------------------------------------
+Si quieres probar primero sin gastar crédito:
+
+1. Edita extract_google_places.py
+2. Reduce las ciudades en CITIES_SEARCH a solo 2-3
+3. Reduce las cadenas en SUPERMARKET_CHAINS a solo 2-3
+4. Ejecuta: python extract_google_places.py
+5. Costo estimado: <$1 USD
+
+====================================================================
+
+4. COSTOS Y LÍMITES
+====================================================================
+
+PRECIOS DE GOOGLE PLACES API (2026):
+-------------------------------------
+- Nearby Search: $32 por 1,000 requests
+- Place Details: $17 por 1,000 requests (opcional)
+- Geocoding: $5 por 1,000 requests (no lo usamos)
+
+CRÉDITOS GRATUITOS:
+-------------------
+- $300 USD durante los primeros 90 días (prueba gratis)
+- $200 USD mensuales PERMANENTEMENTE después
+
+ESTIMACIÓN PARA ESTE PROYECTO:
+-------------------------------
+Búsquedas estimadas:
+  - 20 ciudades × 13 cadenas = 260 búsquedas
+  - Algunas búsquedas tienen múltiples páginas: ~350 requests total
+  
+Costo estimado:
+  - 350 requests × $0.032 = $11.20 USD
+  
+Considerando crédito gratuito:
+  - $200 mensuales - $11.20 = $188.80 restantes
+  - Puedes ejecutar esto ~17 veces al mes GRATIS
+
+CÓMO MINIMIZAR COSTOS:
+----------------------
+1. Ejecutar solo 1 vez al mes (los datos no cambian tan rápido)
+2. Cachear resultados en JSON
+3. Solo actualizar ciudades específicas cuando sea necesario
+4. Usar filtros más específicos
+
+ALERTAS DE FACTURACIÓN (recomendado):
+--------------------------------------
+1. En Google Cloud Console > Facturación
+2. Click en "Presupuestos y alertas"
+3. Crear alerta a $50, $100, $150, $190
+4. Recibirás email si te acercas al límite
+
+====================================================================
+
+5. RESULTADOS ESPERADOS
+====================================================================
+
+COBERTURA GEOGRÁFICA:
+---------------------
+✅ Región Metropolitana (Santiago)
+✅ Región de Valparaíso (Valparaíso, Viña del Mar)
+✅ Región del Biobío (Concepción, Talcahuano, Los Ángeles, Chillán)
+✅ Región de La Araucanía (Temuco)
+✅ Región de Los Lagos (Puerto Montt, Osorno)
+✅ Región de Antofagasta (Antofagasta, Calama)
+✅ Región de Coquimbo (La Serena, Coquimbo)
+✅ Región del Maule (Talca, Curicó)
+✅ Región de O'Higgins (Rancagua)
+✅ Región de Ñuble (Chillán)
+✅ Región de Tarapacá (Iquique)
+✅ Región de Arica y Parinacota (Arica)
+✅ Región de Magallanes (Punta Arenas)
+
+CADENAS INCLUIDAS:
+------------------
+✅ Lider (Walmart Chile)
+✅ Ekono (Walmart Chile)
+✅ SuperBodega aCuenta (Walmart Chile)
+✅ Jumbo (Cencosud)
+✅ Santa Isabel (Cencosud)
+✅ Unimarc (SMU)
+✅ Mayorista 10 (SMU)
+✅ Alvi (SMU)
+✅ OK Market (SMU)
+✅ Tottus
+✅ Montserrat
+✅ Las Brisas
+✅ Merkat
+
+DATOS POR SUPERMERCADO:
+-----------------------
+✅ Nombre exacto
+✅ Dirección completa
+✅ Comuna/Ciudad
+✅ Coordenadas GPS precisas (lat/lon)
+✅ Rating promedio (1-5 estrellas)
+✅ Número de reviews
+✅ Estado (abierto/cerrado)
+✅ Place ID de Google (único)
+
+DATOS OPCIONALES (con Place Details API):
+------------------------------------------
+- Número de teléfono
+- Horarios exactos de apertura
+- Sitio web
+- Fotos del local
+- Reviews de usuarios
+
+CANTIDAD ESTIMADA:
+------------------
+Basado en las 33 actuales:
+  - Lider: ~80-100 sucursales
+  - Jumbo: ~40-50 sucursales
+  - Unimarc: ~200-250 sucursales
+  - Santa Isabel: ~80-100 sucursales
+  - Tottus: ~50-60 sucursales
+  - Otras cadenas: ~100-150 sucursales
+  
+TOTAL ESTIMADO: 600-800 supermercados en Chile
+
+====================================================================
+
+6. SOLUCIÓN DE PROBLEMAS
+====================================================================
+
+ERROR: "API key de Google Places no configurada"
+-------------------------------------------------
+✓ Verifica que el archivo .env existe en /backend
+✓ Verifica que la API key está correctamente escrita
+✓ No debe haber espacios antes o después de la API key
+✓ No uses comillas en el .env
+
+ERROR: "OVER_QUERY_LIMIT"
+--------------------------
+✓ Excediste el límite de requests
+✓ Espera a que se renueve tu cuota mensual
+✓ O habilita facturación si no lo has hecho
+
+ERROR: "REQUEST_DENIED"
+-----------------------
+✓ La API no está habilitada en tu proyecto
+✓ Ve a Google Cloud Console > APIs y servicios > Biblioteca
+✓ Busca "Places API" y click en HABILITAR
+
+ERROR: "INVALID_REQUEST"
+------------------------
+✓ Problema con los parámetros de búsqueda
+✓ Revisa el script extract_google_places.py
+✓ Verifica las coordenadas de las ciudades
+
+LA EXTRACCIÓN ES MUY LENTA
+---------------------------
+✓ Es normal, hay delays de 0.5-2 segundos entre requests
+✓ Esto es para respetar rate limits de Google
+✓ Una extracción completa toma 15-30 minutos
+✓ Puedes pausar con Ctrl+C y reanudar después
+
+POCOS RESULTADOS / SUPERMERCADOS FALTANTES
+-------------------------------------------
+✓ Aumenta el radio de búsqueda (cambiar en CITIES_SEARCH)
+✓ Agrega más ciudades intermedias
+✓ Verifica los nombres de las cadenas (pueden variar)
+✓ Algunos supermercados pequeños pueden no estar en Google
+
+DUPLICADOS EN LA BASE DE DATOS
+-------------------------------
+✓ El script usa place_id para evitar duplicados
+✓ Si aún hay duplicados, ejecuta populate_from_google_places.py de nuevo
+✓ La función limpia la BD antes de insertar
+
+====================================================================
+
+7. SCRIPTS ALTERNATIVOS (Si no quieres usar Google Places)
+====================================================================
+
+Si prefieres NO usar Google Places API, tenemos alternativas:
+
+OPCIÓN 1: Dataset manual curado
+--------------------------------
+Archivos disponibles:
+  - geocode_supermarkets.py (actual, 33 supermercados)
+  - Puedes expandir manualmente la lista
+
+Ventajas:
+  ✅ Gratis
+  ✅ Control total de los datos
+  
+Desventajas:
+  ❌ Trabajo manual intenso
+  ❌ Difícil mantener actualizado
+
+OPCIÓN 2: Web scraping de sitios oficiales
+-------------------------------------------
+Crearemos scripts para:
+  - lider.cl
+  - jumbo.cl
+  - unimarc.cl
+  - santaisabel.cl
+  - tottus.cl
+
+Ventajas:
+  ✅ Datos directos de la fuente
+  ✅ Gratis
+  
+Desventajas:
+  ❌ Se rompe cuando cambian los sitios
+  ❌ Puede violar términos de servicio
+  ❌ Difícil de mantener
+
+OPCIÓN 3: Combinación híbrida
+------------------------------
+  - Usar geocode_supermarkets.py para base inicial
+  - Agregar manualmente supermercados faltantes
+  - Actualizar periodicamente con Google Places
+
+====================================================================
+
+8. PRÓXIMOS PASOS DESPUÉS DE LA EXTRACCIÓN
+====================================================================
+
+Una vez tengas todos los supermercados:
+
+1. ✅ Verificar datos en el mapa
+2. ✅ Probar búsquedas en diferentes ciudades
+3. ⏳ Módulo 2: Comparación de precios
+4. ⏳ Web scraping de precios de productos
+5. ⏳ Sistema de reviews y comentarios
+6. ⏳ App móvil
+
+====================================================================
+
+¿NECESITAS AYUDA?
+====================================================================
+
+Si tienes problemas con:
+  - Configuración de Google Cloud
+  - API key
+  - Errores en la extracción
+  - Costos inesperados
+
+Avísame y te ayudo paso a paso.
+
+====================================================================
+
+RESUMEN RÁPIDO:
+====================================================================
+
+1. Ir a: https://console.cloud.google.com/
+2. Crear proyecto
+3. Habilitar Places API
+4. Crear API key
+5. Configurar facturación (gratis hasta $200/mes)
+6. Copiar API key al archivo .env
+7. Ejecutar: python extract_google_places.py
+8. Ejecutar: python populate_from_google_places.py
+9. ¡Listo! Cientos de supermercados reales en tu mapa
+
+COSTO: ~$11 USD (cubierto por crédito gratuito de $200/mes)
+TIEMPO: ~30 minutos de extracción
+RESULTADO: 600-800 supermercados reales de Chile
+
+====================================================================
+
+¡Buena suerte con la extracción! 🚀🛒🗺️
+
+====================================================================
