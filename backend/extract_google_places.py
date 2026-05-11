@@ -60,6 +60,9 @@ SUPERMARKET_CHAINS = [
     "Merkat",
 ]
 
+# Tipos aceptados devueltos por Google Places que consideramos supermercados
+ACCEPTED_PLACE_TYPES = {"supermarket", "grocery_or_supermarket"}
+
 # TODAS las ciudades y comunas importantes de Chile para búsqueda completa
 # Formato: (nombre, lat, lng, radio_km)
 CITIES_SEARCH = [
@@ -357,6 +360,7 @@ class GooglePlacesExtractor:
             print(f"{'='*70}")
             
             chain_results = []
+            filtered_count = 0
             
             for i, (city, lat, lng, radius_km) in enumerate(CITIES_SEARCH, 1):
                 progress_pct = (i / total_cities) * 100
@@ -368,8 +372,14 @@ class GooglePlacesExtractor:
                 print(f"{len(results)} encontrados | Total acumulado: {len(chain_results)}")
                 
                 for place in results:
+                    # Filtrar por types devueltos por Google Places
+                    place_types = place.get('types', []) or []
+                    if not any(t in ACCEPTED_PLACE_TYPES for t in place_types):
+                        filtered_count += 1
+                        continue
+
                     place_info = self.extract_place_info(place)
-                    
+
                     # Evitar duplicados usando place_id
                     place_id = place_info['place_id']
                     if place_id not in [p['place_id'] for p in chain_results]:
@@ -386,6 +396,8 @@ class GooglePlacesExtractor:
             if chain_results:
                 self.all_places[chain] = chain_results
                 print(f"\n  TOTAL {chain}: {len(chain_results)} supermercados únicos")
+                if filtered_count:
+                    print(f"  FILTRADOS POR TIPO: {filtered_count} resultados omitidos por no ser 'supermarket'/'grocery_or_supermarket'")
         
         return self.all_places
     

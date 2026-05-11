@@ -68,6 +68,12 @@ def populate_database(db: Session, data: dict):
         
         for place in places:
             try:
+                # Si el JSON incluye 'types', aplicar filtro adicional para mayor seguridad
+                place_types = place.get('types', None)
+                if place_types:
+                    if not any(t in ("supermarket", "grocery_or_supermarket") for t in place_types):
+                        # Omitir lugares que no parecen supermercados
+                        continue
                 place_id = place['place_id']
                 
                 # Evitar duplicados
