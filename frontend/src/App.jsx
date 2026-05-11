@@ -67,6 +67,8 @@ function App() {
   const handleDireccionSeleccionada = (ubicacion, nombreDireccion, bbox = null) => {
     setUbicacionUsuario(ubicacion);
     setDireccionBuscada(nombreDireccion);
+    // Incrementar trigger para centrar el mapa en la nueva ubicación
+    setCenterTrigger(prev => prev + 1);
 
     // Si se proporciona bbox, convertir a los nombres usados por la API y usarlo
     if (bbox && bbox.length === 4) {
