@@ -99,7 +99,7 @@ python populate_from_google_places.py
 ### Filtrado por tipo en extracción
 Después de analizar resultados incorrectos (minimarkets/almacenes), se agregó un filtro en la extracción y en el proceso de población: solo se consideran lugares con types devueltos por Google que incluyan "supermarket" o "grocery_or_supermarket". Esto reduce falsos positivos sin aumentar el número de llamadas a la API.
 
-Adicionalmente se añadió un filtro estricto por nombre de cadena: ahora, además de verificar el tipo, el extractor verifica que el nombre del place contenga el token de la cadena buscada (normalizado). Esto asegura que solo se registren sucursales explícitas de las 13 cadenas definidas.
+Adicionalmente, la política fue ajustada: ahora el extractor aceptará cualquier place cuyo tipo incluya **'supermarket'** (se excluye **'grocery_or_supermarket'**). Esto permite incluir supermercados locales y de cadena sin exigir que el nombre contenga la cadena buscada.
 
 
 ## Modelo de Datos Actual

@@ -62,7 +62,10 @@ SUPERMARKET_CHAINS = [
 ]
 
 # Tipos aceptados devueltos por Google Places que consideramos supermercados
-ACCEPTED_PLACE_TYPES = {"supermarket", "grocery_or_supermarket"}
+# Solo aceptar explícitamente el tipo 'supermarket' para incluir supermercados
+# locales y de cadena, pero excluir resultados genéricos etiquetados como
+# 'grocery_or_supermarket' que suelen ser menos precisos.
+ACCEPTED_PLACE_TYPES = {"supermarket"}
 
 
 def _normalize_text(s: str) -> str:
@@ -393,16 +396,8 @@ class GooglePlacesExtractor:
                         filtered_count += 1
                         continue
 
-                    # Filtrar estrictamente por nombre de cadena: el nombre del place debe contener
-                    # el token de la cadena buscada (normalizado). Esto asegura que solo guardemos
-                    # sucursales que pertenezcan explícitamente a las 13 cadenas definidas.
-                    place_name = place.get('name', '')
-                    norm_name = _normalize_text(place_name)
-                    norm_chain = _normalize_text(chain)
-                    if norm_chain not in norm_name:
-                        # No corresponde a la cadena buscada -> omitir
-                        filtered_count += 1
-                        continue
+
+                    # Aceptar cualquier place que sea de tipo 'supermarket' (incluye locales y cadenas)
 
                     place_info = self.extract_place_info(place)
 

@@ -86,16 +86,8 @@ def populate_database(db: Session, data: dict):
                         s2 = ''.join(ch for ch in s2 if unicodedata.category(ch) != 'Mn')
                         return s2.lower()
 
-                    # Lista de cadenas esperadas (mismo orden que en extractor)
-                    CHAINS_LOWER = [
-                        'lider', 'ekono', 'superbodega acuenta', 'jumbo', 'santa isabel',
-                        'unimarc', 'mayorista 10', 'alvi', 'ok market', 'tottus',
-                        'montserrat', 'las brisas', 'merkat'
-                    ]
-
-                    n = _norm(name)
-                    if not any(chain in n for chain in CHAINS_LOWER):
-                        continue
+                    # Ya no imponemos coincidencia estricta por nombre de cadena.
+                    # Permitimos supermercados locales siempre que el tipo indique 'supermarket'.
                 place_id = place['place_id']
                 
                 # Evitar duplicados
