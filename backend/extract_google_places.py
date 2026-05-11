@@ -22,6 +22,7 @@ import time
 import requests
 from typing import List, Dict, Optional
 from dotenv import load_dotenv
+import unicodedata
 
 # Configurar encoding para Windows
 if sys.platform == 'win32':
@@ -62,6 +63,20 @@ SUPERMARKET_CHAINS = [
 
 # Tipos aceptados devueltos por Google Places que consideramos supermercados
 ACCEPTED_PLACE_TYPES = {"supermarket", "grocery_or_supermarket"}
+
+
+def _normalize_text(s: str) -> str:
+    """Normaliza texto para comparación: minúsculas, sin acentos, solo alfanum."""
+    if not s:
+        return ""
+    # Normalizar y remover acentos
+    s = unicodedata.normalize('NFD', s)
+    s = ''.join(ch for ch in s if unicodedata.category(ch) != 'Mn')
+    # Minusculas
+    s = s.lower()
+    # Mantener solo caracteres alfanuméricos y espacios
+    s = ''.join(ch for ch in s if ch.isalnum() or ch.isspace())
+    return s
 
 # TODAS las ciudades y comunas importantes de Chile para búsqueda completa
 # Formato: (nombre, lat, lng, radio_km)
@@ -375,6 +390,17 @@ class GooglePlacesExtractor:
                     # Filtrar por types devueltos por Google Places
                     place_types = place.get('types', []) or []
                     if not any(t in ACCEPTED_PLACE_TYPES for t in place_types):
+                        filtered_count += 1
+                        continue
+
+                    # Filtrar estrictamente por nombre de cadena: el nombre del place debe contener
+                    # el token de la cadena buscada (normalizado). Esto asegura que solo guardemos
+                    # sucursales que pertenezcan explícitamente a las 13 cadenas definidas.
+                    place_name = place.get('name', '')
+                    norm_name = _normalize_text(place_name)
+                    norm_chain = _normalize_text(chain)
+                    if norm_chain not in norm_name:
+                        # No corresponde a la cadena buscada -> omitir
                         filtered_count += 1
                         continue
 

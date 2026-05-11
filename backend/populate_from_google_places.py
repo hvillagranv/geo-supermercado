@@ -74,6 +74,28 @@ def populate_database(db: Session, data: dict):
                     if not any(t in ("supermarket", "grocery_or_supermarket") for t in place_types):
                         # Omitir lugares que no parecen supermercados
                         continue
+
+                # Si el JSON incluye el nombre original, validar que pertenezca a una de las cadenas
+                # Esto evita insertar tiendas que no pertenecen a las 13 cadenas
+                name = place.get('name', '')
+                if name:
+                    # Normalizar similitud básica (minúsculas, sin acentos)
+                    def _norm(s):
+                        import unicodedata
+                        s2 = unicodedata.normalize('NFD', s)
+                        s2 = ''.join(ch for ch in s2 if unicodedata.category(ch) != 'Mn')
+                        return s2.lower()
+
+                    # Lista de cadenas esperadas (mismo orden que en extractor)
+                    CHAINS_LOWER = [
+                        'lider', 'ekono', 'superbodega acuenta', 'jumbo', 'santa isabel',
+                        'unimarc', 'mayorista 10', 'alvi', 'ok market', 'tottus',
+                        'montserrat', 'las brisas', 'merkat'
+                    ]
+
+                    n = _norm(name)
+                    if not any(chain in n for chain in CHAINS_LOWER):
+                        continue
                 place_id = place['place_id']
                 
                 # Evitar duplicados
