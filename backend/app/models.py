@@ -9,7 +9,6 @@ class Supermercado(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, index=True)
-    cadena = Column(String, index=True, nullable=True)
     direccion = Column(String)
     comuna = Column(String)
     ciudad = Column(String, default="Santiago")

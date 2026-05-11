@@ -63,7 +63,6 @@ def get_supermercados_cercanos(
             super_dict = {
                 "id": super_obj.id,
                 "nombre": super_obj.nombre,
-                "cadena": super_obj.cadena,
                 "direccion": super_obj.direccion,
                 "comuna": super_obj.comuna,
                 "ciudad": super_obj.ciudad,

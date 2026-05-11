@@ -5,7 +5,6 @@ from datetime import datetime
 
 class SupermercadoBase(BaseModel):
     nombre: str
-    cadena: Optional[str] = None
     direccion: str
     comuna: str
     ciudad: str = "Santiago"
