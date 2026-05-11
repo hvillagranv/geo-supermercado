@@ -396,6 +396,11 @@ class GooglePlacesExtractor:
                         filtered_count += 1
                         continue
 
+                    # Filtrar por user_ratings_total para excluir minimarkets y espacios muy pequeños
+                    user_ratings_total = place.get('user_ratings_total', 0)
+                    if user_ratings_total < 50:
+                        filtered_count += 1
+                        continue
 
                     # Aceptar cualquier place que sea de tipo 'supermarket' (incluye locales y cadenas)
 

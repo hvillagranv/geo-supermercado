@@ -71,9 +71,15 @@ def populate_database(db: Session, data: dict):
                 # Si el JSON incluye 'types', aplicar filtro adicional para mayor seguridad
                 place_types = place.get('types', None)
                 if place_types:
-                    if not any(t in ("supermarket", "grocery_or_supermarket") for t in place_types):
-                        # Omitir lugares que no parecen supermercados
+                    if not any(t in ("supermarket",) for t in place_types):
+                        # Omitir lugares que no sean tipo 'supermarket'
                         continue
+
+                # Filtrar por user_ratings_total para excluir minimarkets y espacios muy pequeños
+                user_ratings_total = place.get('user_ratings_total', 0)
+                if user_ratings_total < 50:
+                    # Omitir lugares con muy pocas reseñas (probablemente minimarkets o muy pequeños)
+                    continue
 
                 # Si el JSON incluye el nombre original, validar que pertenezca a una de las cadenas
                 # Esto evita insertar tiendas que no pertenecen a las 13 cadenas

@@ -90,18 +90,35 @@ function MapBoundsHandler({ onBoundsChange }) {
 }
 
 
-// Componente para centrar el mapa en la ubicación del usuario
-function CenterMap({ center }) {
+// Componente para centrar el mapa SOLO cuando se solicita explícitamente
+// triggerCenter es un número que se incrementa cada vez que queremos centrar
+function CenterMap({ center, triggerCenter }) {
   const map = useMap();
+  const lastTriggerRef = useRef(null);
   useEffect(() => {
-    if (center) {
-      map.setView(center, 13);
-    }
-  }, [center, map]);
+    if (!center) return;
+    if (triggerCenter === lastTriggerRef.current) return; // No re-centrar si el trigger no cambió
+    
+    lastTriggerRef.current = triggerCenter;
+    map.setView(center, 13);
+  }, [center, triggerCenter, map]);
   return null;
 }
 
-export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChange, onBoundsChange, onMapClickCallback }) {
+function SelectedSuperCenter({ selected }) {
+  const map = useMap();
+  const lastRef = useRef(null);
+  useEffect(() => {
+    if (!selected) return;
+    if (lastRef.current === selected.id) return;
+    lastRef.current = selected.id;
+    // fly to the supermercado once, do not change ubicacionUsuario
+    map.flyTo([selected.latitud, selected.longitud], 15, { duration: 0.8 });
+  }, [selected, map]);
+  return null;
+}
+
+export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChange, onBoundsChange, onMapClickCallback, selectedSupermercado, onSelectSupermercado, centerTrigger, comunaReferencia }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [clickedLocation, setClickedLocation] = useState(null);
@@ -109,13 +126,24 @@ export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChang
 
   // Centro por defecto (Santiago, Plaza de Armas)
   const defaultCenter = [-33.4372, -70.6506];
-  const center = ubicacionUsuario || defaultCenter;
+
+  // Mantener una referencia estable para el prop `center` que se pasa a MapContainer.
+  // Evita que re-renders normales (por ejemplo seleccionar un supermercado) re-centren el mapa
+  const centerRef = useRef(ubicacionUsuario || defaultCenter);
+  useEffect(() => {
+    if (ubicacionUsuario && (
+      !centerRef.current || Math.abs(centerRef.current[0] - ubicacionUsuario[0]) > 1e-6 || Math.abs(centerRef.current[1] - ubicacionUsuario[1]) > 1e-6
+    )) {
+      centerRef.current = ubicacionUsuario;
+    }
+    // No actualizamos centerRef cuando no hay ubicacionUsuario para mantener el centro inicial estable
+  }, [ubicacionUsuario]);
 
   // Manejar click en el mapa
   const handleMapClick = (latlng) => {
     setClickedLocation(latlng);
     setIsManualLocation(true);
-    onUbicacionChange(latlng);
+    onUbicacionChange(latlng); // Esto ya incrementa centerTrigger en App
     setError(null);
     // Llamar al callback del padre si existe
     if (onMapClickCallback) {
@@ -147,7 +175,7 @@ export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChang
         const ubicacion = [latitude, longitude];
         setClickedLocation(null);
         setIsManualLocation(false);
-        onUbicacionChange(ubicacion);
+        onUbicacionChange(ubicacion); // Esto ya incrementa centerTrigger en App
         setLoading(false);
         // Llamar al callback para cargar supermercados
         if (onMapClickCallback) {
@@ -208,7 +236,7 @@ export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChang
       )}
 
       <MapContainer 
-        center={center} 
+        center={centerRef.current}
         zoom={13} 
         style={{ height: '500px', width: '100%', borderRadius: '8px', cursor: 'crosshair' }}
       >
@@ -217,9 +245,12 @@ export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChang
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
-        <CenterMap center={ubicacionUsuario} />
+        <CenterMap center={ubicacionUsuario} triggerCenter={centerTrigger} />
         <MapClickHandler onMapClick={handleMapClick} />
         <MapBoundsHandler onBoundsChange={onBoundsChange} />
+        {/* No centrar automáticamente al seleccionar un supermercado (opción A).
+            SelectedSuperCenter exists but is intentionally not rendered to avoid
+            changing the map view and blocking user panning. */}
 
         {/* Marcador de ubicación del usuario (GPS) */}
         {ubicacionUsuario && !isManualLocation && (
@@ -247,6 +278,15 @@ export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChang
             key={super_obj.id} 
             position={[super_obj.latitud, super_obj.longitud]}
             icon={superIcon}
+            eventHandlers={{
+              click: (e) => {
+                // Evitar que el click en el marker se propague al mapa
+                // (mapa tiene un handler global de click que cambia la ubicacion de referencia)
+                try { e.originalEvent && e.originalEvent.stopPropagation(); } catch (_) {}
+                // Seleccionar supermercado pero NO cambiar la ubicacionUsuario
+                if (onSelectSupermercado) onSelectSupermercado(super_obj);
+              }
+            }}
           >
             <Popup>
               <div className="popup-content">
@@ -267,20 +307,31 @@ export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChang
         <div className="lista-supermercados">
           <h3>Lista de Supermercados ({supermercados.length})</h3>
           <div className="supermercados-grid">
-            {supermercados.map((super_obj) => (
-              <div key={super_obj.id} className="supermercado-card">
+        {supermercados.map((super_obj) => {
+          // Verificar si está en la misma comuna que la referencia
+          const mismaComuna = comunaReferencia && super_obj.comuna === comunaReferencia;
+          const cardClass = mismaComuna ? "supermercado-card misma-comuna" : "supermercado-card";
+          
+          return (
+            <div key={super_obj.id} className={cardClass} onClick={() => onSelectSupermercado && onSelectSupermercado(super_obj)}>
                 <div className="card-header">
                   <h4>{super_obj.nombre}</h4>
-                  {super_obj.distancia && (
-                    <span className="badge">{super_obj.distancia.toFixed(2)} km</span>
-                  )}
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    {mismaComuna && (
+                      <span className="badge badge-comuna">📍 Misma comuna</span>
+                    )}
+                    {super_obj.distancia && (
+                      <span className="badge">{super_obj.distancia.toFixed(2)} km</span>
+                    )}
+                  </div>
                 </div>
                 <p className="direccion">{super_obj.direccion}, {super_obj.comuna}</p>
                 {super_obj.telefono && (
                   <p className="telefono">📞 {super_obj.telefono}</p>
                 )}
               </div>
-            ))}
+          );
+        })}
           </div>
         </div>
       )}

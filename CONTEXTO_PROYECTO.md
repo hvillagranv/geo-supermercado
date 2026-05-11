@@ -101,6 +101,16 @@ Después de analizar resultados incorrectos (minimarkets/almacenes), se agregó 
 
 Adicionalmente, la política fue ajustada: ahora el extractor aceptará cualquier place cuyo tipo incluya **'supermarket'** (se excluye **'grocery_or_supermarket'**). Esto permite incluir supermercados locales y de cadena sin exigir que el nombre contenga la cadena buscada.
 
+### Filtrado por número de reseñas (user_ratings_total)
+Para eliminar minimarkets y espacios muy pequeños que no son supermercados reales, se agregó un filtro adicional:
+- **Requisito mínimo**: `user_ratings_total >= 50`
+- **Motivo**: Los minimarkets y tiendas muy pequeñas tienen pocas o ninguna reseña en Google. Un umbral de 50 asegura que solo se incluyan establecimientos bien establecidos, con presencia significativa y visitados regularmente por clientes.
+- **Aplicado en**: 
+  - `backend/extract_google_places.py` (línea ~399)
+  - `backend/populate_from_google_places.py` (línea ~80)
+  
+Este filtro complementa el filtro por tipo y ayuda a asegurar que solo se incluyan supermercados establecidos con presencia real y buena reputación.
+
 
 ## Modelo de Datos Actual
 

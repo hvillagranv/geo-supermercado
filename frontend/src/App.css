@@ -459,7 +459,7 @@ body {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 1.5rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
 .supermercado-card:hover {
@@ -467,12 +467,26 @@ body {
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
 }
 
+/* Tarjetas de supermercados en la misma comuna que el punto de referencia */
+.supermercado-card.misma-comuna {
+  border: 3px solid #28a745;
+  border-left: 6px solid #28a745;
+  background: #f0fff4;
+}
+
+.supermercado-card.misma-comuna:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(40, 167, 69, 0.3);
+  border-color: #218838;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 0.75rem;
-  gap: 1rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .card-header h4 {
@@ -490,6 +504,11 @@ body {
   font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.badge-comuna {
+  background: #28a745;
+  color: white;
 }
 
 .cadena {

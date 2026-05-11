@@ -12,6 +12,9 @@ function App() {
   const [error, setError] = useState(null);
   const [direccionBuscada, setDireccionBuscada] = useState(null);
   const [mapBounds, setMapBounds] = useState(null);
+  const [selectedSupermercado, setSelectedSupermercado] = useState(null);
+  const [centerTrigger, setCenterTrigger] = useState(0); // Trigger para centrar mapa
+  const [comunaReferencia, setComunaReferencia] = useState(null); // Comuna del punto de referencia
 
   // Carga supermercados usando los bounds actuales o unos pasados como override
   // Carga supermercados usando los bounds actuales o unos pasados como override
@@ -31,6 +34,11 @@ function App() {
       if (referencia) {
         data = agregarDistancias(data, referencia);
         data = ordenarPorDistancia(data);
+        
+        // Identificar la comuna del supermercado más cercano como referencia
+        if (data.length > 0) {
+          setComunaReferencia(data[0].comuna);
+        }
       }
 
       setSupermercados(data);
@@ -46,6 +54,8 @@ function App() {
 
   const handleUbicacionChange = (nuevaUbicacion) => {
     setUbicacionUsuario(nuevaUbicacion);
+    // Incrementar trigger para que el mapa centre en la nueva ubicación
+    setCenterTrigger(prev => prev + 1);
   };
 
   const handleBoundsChange = useCallback((bounds) => {
@@ -150,6 +160,10 @@ function App() {
           onUbicacionChange={handleUbicacionChange}
           onBoundsChange={handleBoundsChange}
           onMapClickCallback={handleMapClick}
+          selectedSupermercado={selectedSupermercado}
+          onSelectSupermercado={setSelectedSupermercado}
+          centerTrigger={centerTrigger}
+          comunaReferencia={comunaReferencia}
         />
       </main>
 
