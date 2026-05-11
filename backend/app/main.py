@@ -80,6 +80,36 @@ def obtener_supermercados_cercanos(
     return supermercados
 
 
+@app.get("/api/supermercados/bounds", response_model=List[schemas.Supermercado])
+def obtener_supermercados_por_bounds(
+    lat_min: float = Query(..., description="Latitud mínima (sur)"),
+    lat_max: float = Query(..., description="Latitud máxima (norte)"),
+    lng_min: float = Query(..., description="Longitud mínima (oeste)"),
+    lng_max: float = Query(..., description="Longitud máxima (este)"),
+    limit: int = Query(500, description="Número máximo de resultados"),
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene supermercados dentro de un área geográfica (bounds del mapa).
+    
+    - **lat_min**: Latitud mínima (borde sur)
+    - **lat_max**: Latitud máxima (borde norte)
+    - **lng_min**: Longitud mínima (borde oeste)
+    - **lng_max**: Longitud máxima (borde este)
+    - **limit**: Máximo número de resultados (default: 500)
+    """
+    supermercados = crud.get_supermercados_por_bounds(
+        db=db,
+        lat_min=lat_min,
+        lat_max=lat_max,
+        lng_min=lng_min,
+        lng_max=lng_max,
+        limit=limit
+    )
+    
+    return supermercados
+
+
 @app.get("/api/supermercados/{supermercado_id}", response_model=schemas.Supermercado)
 def obtener_supermercado(
     supermercado_id: int, 

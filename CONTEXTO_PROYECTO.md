@@ -2,12 +2,12 @@
 
 ## Resumen del Proyecto
 
-Aplicación web para encontrar supermercados cercanos en Chile usando geolocalización y búsqueda por mapa interactivo.
+Aplicación web para encontrar supermercados cercanos en Chile usando geolocalización y búsqueda por mapa interactivo. Permite buscar direcciones, seleccionar puntos en el mapa y ver supermercados dentro del área visible, calculando la distancia desde el punto de referencia seleccionado.
 
 **Stack Tecnológico:**
 - **Backend**: FastAPI + SQLite + SQLAlchemy
 - **Frontend**: React + Vite + Leaflet (mapas)
-- **API**: Google Places API para datos de supermercados
+- **APIs**: Nominatim (OpenStreetMap) para geocodificación; Google Places API usado para la extracción inicial de datos
 
 ---
 

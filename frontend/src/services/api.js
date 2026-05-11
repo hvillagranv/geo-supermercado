@@ -25,6 +25,20 @@ export const supermercadoService = {
     return response.data;
   },
 
+  // Obtener supermercados por área (bounds del mapa)
+  getPorBounds: async (latMin, latMax, lngMin, lngMax, limit = 500) => {
+    const response = await api.get('/supermercados/bounds', {
+      params: { 
+        lat_min: latMin, 
+        lat_max: latMax, 
+        lng_min: lngMin, 
+        lng_max: lngMax,
+        limit 
+      }
+    });
+    return response.data;
+  },
+
   // Obtener un supermercado por ID
   getById: async (id) => {
     const response = await api.get(`/supermercados/${id}`);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -51,6 +51,45 @@ function MapClickHandler({ onMapClick }) {
   return null;
 }
 
+// Componente para detectar cambios de bounds (zoom y movimiento)
+function MapBoundsHandler({ onBoundsChange }) {
+  const map = useMap();
+  const boundsRef = useRef(null);
+
+  useEffect(() => {
+    const updateBounds = () => {
+      const bounds = map.getBounds();
+      const boundsData = {
+        latMin: bounds.getSouth(),
+        latMax: bounds.getNorth(),
+        lngMin: bounds.getWest(),
+        lngMax: bounds.getEast(),
+      };
+      
+      // Solo actualizar si los bounds han cambiado significativamente
+      const boundsString = JSON.stringify(boundsData);
+      if (boundsRef.current !== boundsString) {
+        boundsRef.current = boundsString;
+        onBoundsChange(boundsData);
+      }
+    };
+
+    // Actualizar bounds cuando el mapa termina de moverse
+    map.on('moveend', updateBounds);
+
+    // Actualizar bounds inicial
+    updateBounds();
+
+    // Cleanup
+    return () => {
+      map.off('moveend', updateBounds);
+    };
+  }, [map, onBoundsChange]);
+
+  return null;
+}
+
+
 // Componente para centrar el mapa en la ubicación del usuario
 function CenterMap({ center }) {
   const map = useMap();
@@ -62,7 +101,7 @@ function CenterMap({ center }) {
   return null;
 }
 
-export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChange }) {
+export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChange, onBoundsChange, onMapClickCallback }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [clickedLocation, setClickedLocation] = useState(null);
@@ -78,6 +117,10 @@ export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChang
     setIsManualLocation(true);
     onUbicacionChange(latlng);
     setError(null);
+    // Llamar al callback del padre si existe
+    if (onMapClickCallback) {
+      onMapClickCallback(latlng);
+    }
   };
 
   // Resetear a ubicación GPS del usuario
@@ -101,10 +144,17 @@ export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChang
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+        const ubicacion = [latitude, longitude];
         setClickedLocation(null);
         setIsManualLocation(false);
-        onUbicacionChange([latitude, longitude]);
+        onUbicacionChange(ubicacion);
         setLoading(false);
+        // Llamar al callback para cargar supermercados
+        if (onMapClickCallback) {
+          setTimeout(() => {
+            onMapClickCallback(ubicacion);
+          }, 300);
+        }
       },
       (error) => {
         console.error('Error obteniendo ubicación:', error);
@@ -117,14 +167,14 @@ export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChang
   return (
     <div className="mapa-container">
       <div className="mapa-header">
-        <h2>Supermercados Cercanos</h2>
+        <h2>Supermercados en el Mapa</h2>
         <div className="btn-group">
           <button 
             onClick={obtenerUbicacion} 
             disabled={loading}
             className="btn-ubicacion"
           >
-            {loading ? 'Obteniendo ubicación...' : '📍 Mi Ubicación GPS'}
+            {loading ? 'Obteniendo ubicación...' : '📍 Ir a Mi Ubicación'}
           </button>
           {isManualLocation && (
             <button 
@@ -141,13 +191,13 @@ export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChang
       {/* Instrucción de uso */}
       {!ubicacionUsuario && !loading && (
         <div className="alert alert-info">
-          💡 Haz clic en "Mi Ubicación GPS" o haz clic en cualquier punto del mapa para buscar supermercados
+          💡 Busca una dirección arriba, haz clic en "Ir a Mi Ubicación", o haz clic en cualquier punto del mapa para ver supermercados cercanos
         </div>
       )}
 
       {isManualLocation && (
         <div className="alert alert-success">
-          ✓ Ubicación seleccionada en el mapa. Haz clic en otro punto para cambiar o usa "Resetear" para volver a tu ubicación GPS.
+          ✓ Ubicación seleccionada en el mapa. Mueve el mapa o haz zoom para ver más supermercados.
         </div>
       )}
 
@@ -169,6 +219,7 @@ export default function Mapa({ supermercados, ubicacionUsuario, onUbicacionChang
         
         <CenterMap center={ubicacionUsuario} />
         <MapClickHandler onMapClick={handleMapClick} />
+        <MapBoundsHandler onBoundsChange={onBoundsChange} />
 
         {/* Marcador de ubicación del usuario (GPS) */}
         {ubicacionUsuario && !isManualLocation && (

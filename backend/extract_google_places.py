@@ -359,12 +359,13 @@ class GooglePlacesExtractor:
             chain_results = []
             
             for i, (city, lat, lng, radius_km) in enumerate(CITIES_SEARCH, 1):
-                print(f"  [{i}/{total_cities}] {city}... ", end='', flush=True)
+                progress_pct = (i / total_cities) * 100
+                print(f"  [{i}/{total_cities}] ({progress_pct:.1f}%) {city}... ", end='', flush=True)
                 
                 radius_m = radius_km * 1000
                 results = self.search_nearby(chain, lat, lng, radius_m)
                 
-                print(f"{len(results)} encontrados")
+                print(f"{len(results)} encontrados | Total acumulado: {len(chain_results)}")
                 
                 for place in results:
                     place_info = self.extract_place_info(place)
@@ -373,6 +374,10 @@ class GooglePlacesExtractor:
                     place_id = place_info['place_id']
                     if place_id not in [p['place_id'] for p in chain_results]:
                         chain_results.append(place_info)
+                
+                # Mostrar resumen cada 25 ciudades
+                if i % 25 == 0:
+                    print(f"  >>> PROGRESO: {i}/{total_cities} ciudades completadas - {len(chain_results)} supermercados únicos encontrados")
                 
                 # Respetar rate limits
                 time.sleep(0.5)

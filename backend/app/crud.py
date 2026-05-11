@@ -82,6 +82,37 @@ def get_supermercados_cercanos(
     return supermercados_con_distancia[:limit]
 
 
+def get_supermercados_por_bounds(
+    db: Session,
+    lat_min: float,
+    lat_max: float,
+    lng_min: float,
+    lng_max: float,
+    limit: int = 500
+) -> List[models.Supermercado]:
+    """
+    Obtiene todos los supermercados dentro de un área geográfica (bounds).
+    
+    Args:
+        db: Session de base de datos
+        lat_min: Latitud mínima (sur)
+        lat_max: Latitud máxima (norte)
+        lng_min: Longitud mínima (oeste)
+        lng_max: Longitud máxima (este)
+        limit: Máximo número de resultados
+    
+    Returns:
+        Lista de supermercados dentro del área
+    """
+    return db.query(models.Supermercado).filter(
+        models.Supermercado.latitud >= lat_min,
+        models.Supermercado.latitud <= lat_max,
+        models.Supermercado.longitud >= lng_min,
+        models.Supermercado.longitud <= lng_max
+    ).limit(limit).all()
+
+
+
 def get_productos(db: Session, skip: int = 0, limit: int = 100) -> List[models.Producto]:
     """Obtiene todos los productos"""
     return db.query(models.Producto).offset(skip).limit(limit).all()
