@@ -28,19 +28,30 @@ def load_google_places_data(filename: str = "supermarkets_google_places.json"):
 
 def clean_address(address: str) -> tuple:
     """
-    Intenta extraer comuna de la dirección
+    Extrae dirección y comuna de la dirección de Google Places.
+    
+    Las direcciones vienen en diferentes formatos:
+    - "Calle 123, Comuna" (2 partes) -> Comuna es la última
+    - "Calle, Otra Calle, Comuna" (3+ partes) -> Comuna es la última
+    - "Comuna" (1 parte) -> Es solo la comuna, usarla como dirección también
+    
+    Returns:
+        tuple: (direccion, comuna)
     """
-    # Direcciones vienen como "Calle 123, Comuna, Región"
-    parts = address.split(',')
+    parts = [p.strip() for p in address.split(',')]
     
-    if len(parts) >= 2:
-        comuna = parts[-1].strip() if len(parts) == 2 else parts[-2].strip()
-        direccion = parts[0].strip()
+    if len(parts) == 1:
+        # Solo hay una parte, es la comuna/ciudad
+        return address, address
+    elif len(parts) >= 2:
+        # La comuna SIEMPRE es la última parte
+        comuna = parts[-1]
+        # La dirección es todo menos la última parte
+        direccion = ', '.join(parts[:-1])
+        return direccion, comuna
     else:
-        comuna = "Sin comuna"
-        direccion = address
-    
-    return direccion, comuna
+        # Caso por defecto (no debería ocurrir)
+        return address, "Sin comuna"
 
 
 def populate_database(db: Session, data: dict):
