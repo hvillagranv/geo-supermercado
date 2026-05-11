@@ -11,14 +11,21 @@ ENV/
 dist/
 build/
 
-# Database
+# Database - NO subir bases de datos
 *.db
 *.sqlite
 *.sqlite3
+backend/supermercado.db
+supermercado.db
 
-# Environment variables
+# Environment variables - DATOS SENSIBLES
 .env
 .env.local
+.env.*.local
+backend/.env
+backend/.env.local
+*.env
+!.env.example
 
 # IDE
 .vscode/
@@ -39,3 +46,14 @@ frontend/build/
 # OS
 .DS_Store
 Thumbs.db
+
+# API Keys y credenciales
+**/credentials.json
+**/service-account.json
+**/*_key.json
+**/*-key.json
+
+# Logs con posible información sensible
+*.log
+logs/
+*.log.*
